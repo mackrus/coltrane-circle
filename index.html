@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coltrane Geometry Player</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body { background: #1a1a1a; color: #eee; font-family: sans-serif; text-align: center; }
+        svg { max-width: 500px; margin-top: 20px; cursor: crosshair; }
+        .note-circle { fill: #333; stroke: #555; stroke-width: 1; transition: 0.2s; }
+        .note-circle:hover { fill: #ff4500; }
+        .label { fill: white; font-size: 14px; pointer-events: none; }
+        .trigon { fill: rgba(255, 69, 0, 0.2); stroke: #ff4500; stroke-width: 2; stroke-dasharray: 5; }
+        button { padding: 10px 20px; margin: 20px; cursor: pointer; background: #ff4500; border: none; color: white; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Coltrane's Circle of Tones</h2>
+    <p>Click a note to play, or hit Play Cycle to hear the "Giant Steps" triangle.</p>
+    <button onclick="startAudio()">1. Enable Audio</button>
+    <button onclick="playCycle()">2. Play "Giant Steps" Cycle</button>
+    <br>
+    <svg viewBox="-150 -150 300 300" id="coltraneSVG"></svg>
+
+<script>
+    const notes = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+    const synth = new Tone.Synth().toDestination();
+    const svg = document.getElementById('coltraneSVG');
+    const radius = 120;
+
+    // 1. Draw the Trigon (Major Thirds: B - G - Eb)
+    const points = [11, 7, 3].map(i => {
+        const angle = (i * 30 - 90) * (Math.PI / 180);
+        return `${radius * Math.cos(angle)},${radius * Math.sin(angle)}`;
+    }).join(' ');
+    
+    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    poly.setAttribute("points", points);
+    poly.setAttribute("class", "trigon");
+    svg.appendChild(poly);
+
+    // 2. Draw Notes
+    notes.forEach((note, i) => {
+        const angle = (i * 30 - 90) * (Math.PI / 180);
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", x);
+        circle.setAttribute("cy", y);
+        circle.setAttribute("r", "15");
+        circle.setAttribute("class", "note-circle");
+        circle.onclick = () => playNote(note, 4);
+        
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", x);
+        text.setAttribute("y", y + 5);
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("class", "label");
+        text.textContent = note;
+
+        svg.appendChild(circle);
+        svg.appendChild(text);
+    });
+
+    async function startAudio() { await Tone.start(); console.log("Audio Ready"); }
+
+    function playNote(note, octave) {
+        synth.triggerAttackRelease(`${note}${octave}`, "8n");
+    }
+
+    function playCycle() {
+        const now = Tone.now();
+        // The B -> G -> Eb Cycle
+        playNote('B', 3);
+        setTimeout(() => playNote('G', 3), 500);
+        setTimeout(() => playNote('Eb', 4), 1000);
+        setTimeout(() => playNote('B', 4), 1500);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Node / JS
+www/node_modules/
+www/dist/
+.DS_Store
+
+# Rust / Cargo
+theory-crate/target/
+
+# Ignore the pkg folder inside the rust crate
+theory-crate/pkg/
+
+# (We will track www/src/pkg because it's required for the frontend to run without rebuilding rust)

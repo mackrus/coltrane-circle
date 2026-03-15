@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coltrane Geometry</title>
+    <style>
+      body { 
+        background: #1a1a1a; 
+        color: #eee; 
+        font-family: sans-serif; 
+        display: flex; 
+        flex-direction: column;
+        justify-content: center; 
+        align-items: center; 
+        height: 100vh; 
+        margin: 0; 
+        overflow: hidden;
+      }
+      svg { 
+        width: 75vmin; 
+        height: 75vmin; 
+        cursor: crosshair; 
+      }
+      .note-circle { 
+        fill: #333; 
+        stroke: #555; 
+        stroke-width: 1; 
+        transition: all 0.3s ease; 
+        cursor: pointer; 
+      }
+      .note-circle:hover { 
+        fill: #ff4500; 
+        r: 18;
+      }
+      .note-circle.active {
+        fill: #ffea00 !important;
+        stroke: white !important;
+        stroke-width: 3 !important;
+        r: 22 !important;
+        filter: drop-shadow(0 0 8px #ffea00);
+      }
+      .note-circle.in-scale {
+        stroke: #ff4500;
+        stroke-width: 2;
+        fill: #444;
+      }
+      .label { 
+        fill: white; 
+        font-weight: bold;
+        pointer-events: none; 
+        user-select: none;
+      }
+      .label.off-scale {
+        opacity: 0.3;
+      }
+      #trigon {
+        transition: points 0.4s ease-in-out;
+      }
+      .harmonic-bridge {
+        stroke: #ff9900;
+        stroke-width: 1;
+        stroke-dasharray: 2 6;
+        stroke-linecap: round;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+      .harmonic-bridge.visible {
+        opacity: 0.8;
+      }
+      .controls {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        background: rgba(255,255,255,0.03);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #333;
+      }
+      .btn-group {
+        display: flex;
+        gap: 8px;
+      }
+      .btn {
+        background: none;
+        border: 1px solid #444;
+        color: #777;
+        padding: 4px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+        transition: 0.2s;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .btn:hover, .btn.active {
+        border-color: #ff4500;
+        color: #ff4500;
+      }
+      .btn.toggle-active {
+        background: #ff4500;
+        color: white;
+        border-color: #ff4500;
+      }
+      .label-group {
+        color: #555;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 3px;
+      }
+      select {
+        background: #222;
+        color: #eee;
+        border: 1px solid #444;
+        font-size: 10px;
+        padding: 2px 5px;
+        border-radius: 3px;
+        outline: none;
+      }
+    </style>
+  </head>
+  <body>
+    <svg viewBox="-150 -150 300 300" id="coltraneSVG"></svg>
+    
+    <button id="instructions-btn" style="position: absolute; top: 20px; right: 20px; background: none; border: 1px solid #555; color: #888; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;">Instructions</button>
+
+    <div id="instructions-modal" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(5px);">
+      <div style="background: #111; border: 1px solid #333; padding: 40px; max-width: 520px; border-radius: 8px; color: #ddd; line-height: 1.6; font-size: 14px; position: relative;">
+        <button id="close-instructions" style="position: absolute; top: 15px; right: 15px; background: none; border: none; color: #888; cursor: pointer; font-size: 20px; transition: color 0.2s;">&times;</button>
+        <h2 style="color: #ff9900; margin-top: 0; font-size: 16px; text-transform: uppercase; letter-spacing: 2px;">How to see the music</h2>
+        <p><strong>1. The Two Rings:</strong> The outer ring is distance by sound (semitones). The inner ring is distance by harmony (perfect fifths). Hover over any note to see the bridge connecting them.</p>
+        <p><strong>2. The Geometry (The Math):</strong> Music is just dividing the number 12. Triangles divide it by 4 (Major Thirds). Squares divide it by 3 (Minor Thirds). These shapes act as "wormholes" to instantly travel between distant keys.</p>
+        <p><strong>3. The Scale Lens (The Rules):</strong> Traditional music lives within a 7-note scale (Red). Turn it on to see the boundaries of a key.</p>
+        <p><strong>4. The Secret:</strong> Turn on a Scale (Red) and a Geometry (Orange). Watch the geometry step <em>outside</em> the red rules. That is how John Coltrane broke the rules using math. Hit "Giant Steps Cycle" to hear the wormhole in action.</p>
+        
+        <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; font-size: 12px; color: #aaa;">
+          <h3 style="color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Further Exploration</h3>
+          <p style="margin: 5px 0;">To dive deeper into the mathematics of John Coltrane's system and the "Tone Circle":</p>
+          <ul style="margin: 5px 0; padding-left: 20px;">
+            <li>Watch: <a href="https://www.youtube.com/watch?v=rz0dQN9eX_4" target="_blank" style="color: #ff9900; text-decoration: none;">"The John Coltrane Circle Explained"</a></li>
+            <li>Watch: <a href="https://www.youtube.com/watch?v=2kotK9FNEYU" target="_blank" style="color: #ff9900; text-decoration: none;">"Giant Steps" animated sheet music</a></li>
+            <li>Read: <a href="http://cgm.cs.mcgill.ca/~godfried/publications/geometry-of-rhythm.pdf" target="_blank" style="color: #ff9900; text-decoration: none;">"The Geometry of Musical Rhythm" by Godfried Toussaint</a></li>
+            <li>Read: <a href="https://dmitri.mycpanel.princeton.edu/files/publications/science.pdf" target="_blank" style="color: #ff9900; text-decoration: none;">"The Geometry of Musical Chords" by Dmitri Tymoczko (Science)</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+        <div style="display: flex; gap: 30px;">
+            <!-- Symmetry -->
+            <div style="text-align: center;">
+                <div class="label-group">Symmetry</div>
+                <div class="btn-group">
+                    <button class="btn symmetry-btn" data-sides="2">2</button>
+                    <button class="btn symmetry-btn active" data-sides="3">3</button>
+                    <button class="btn symmetry-btn" data-sides="4">4</button>
+                    <button class="btn symmetry-btn" data-sides="6">6</button>
+                </div>
+            </div>
+
+            <!-- Scale -->
+            <div style="text-align: center;">
+                <div class="label-group">Scale Lens</div>
+                <div class="btn-group" style="align-items: center;">
+                    <select id="scale-root">
+                        <option value="0">C</option> <option value="1">C#</option> <option value="2">D</option>
+                        <option value="3">Eb</option> <option value="4">E</option> <option value="5">F</option>
+                        <option value="6">F#</option> <option value="7">G</option> <option value="8">Ab</option>
+                        <option value="9">A</option> <option value="10">Bb</option> <option value="11">B</option>
+                    </select>
+                    <select id="scale-type">
+                        <option value="major">Major</option>
+                        <option value="minor">Minor</option>
+                        <option value="dorian">Dorian</option>
+                        <option value="mixolydian">Mixolydian</option>
+                    </select>
+                    <button class="btn" id="toggle-scale">Highlight Off</button>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <div class="label-group">Sequences</div>
+            <div class="btn-group">
+                <button class="btn" id="play-giant-steps">Giant Steps Cycle</button>
+                <button class="btn" id="play-fifths">Circle of Fifths</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
