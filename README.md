@@ -4,7 +4,7 @@ An interactive, educational web application built with **Rust (WebAssembly)** an
 
 [**🚀 Play with the Live App Here**](https://mackrus.github.io/coltrane-circle/)
 
-![App Screenshot Placeholder](https://via.placeholder.com/800x400/1a1a1a/ff9900?text=Coltrane+Geometry)
+![App Screenshot](assets/demo.png)
 
 ## The Theory
 
